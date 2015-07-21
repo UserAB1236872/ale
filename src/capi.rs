@@ -179,6 +179,12 @@ impl Game {
             actions
         }
     }
+
+    pub fn frame_number(&self) -> i32 {
+        unsafe {
+            getFrameNumber(self.ale.p)
+        }
+    }
 }
 
 impl Into<ALE> for Game {
@@ -219,4 +225,6 @@ extern {
     fn getLegalActionSize(i: *mut ale_interface) -> c_int;
     fn getMinimalActionSet(i: *mut ale_interface, actions: *mut c_int);
     fn getMinimalActionSize(i: *mut ale_interface) -> c_int;
+
+    fn getFrameNumber(i: *mut ale_interface) -> c_int;
 }
