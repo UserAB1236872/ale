@@ -66,6 +66,14 @@ impl ALE {
             setBool(self.p, key.as_ptr(), val as c_int);
         }
     }
+
+    pub fn set_int(&self, key: &str, val: isize) {
+        unsafe {
+            let key = CString::new(key).unwrap();
+
+            setInt(self.p, key.as_ptr(), val as c_int);
+        }
+    }
 }
 
 impl Drop for ALE {
@@ -91,4 +99,5 @@ extern {
     // Setters
     fn setString(i: *mut ale_interface, key: *const c_char, val: *const c_char);
     fn setBool(i: *mut ale_interface, key: *const c_char, val: c_int);
+    fn setInt(i: *mut ale_interface, key: *const c_char, val: c_int);
 }
