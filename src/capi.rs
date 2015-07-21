@@ -82,6 +82,14 @@ impl ALE {
             setFloat(self.p, key.as_ptr(), val as c_float);
         }
     }
+
+    pub fn load_rom(&self, file_name: &str) {
+        unsafe {
+            let file_name = CString::new(file_name).unwrap();
+
+            loadROM(self.p, file_name.as_ptr());
+        }
+    } 
 }
 
 impl Drop for ALE {
@@ -109,4 +117,6 @@ extern {
     fn setBool(i: *mut ale_interface, key: *const c_char, val: c_int);
     fn setInt(i: *mut ale_interface, key: *const c_char, val: c_int);
     fn setFloat(i: *mut ale_interface, key: *const c_char, val: c_float);
+
+    fn loadROM(i: *mut ale_interface, file_name: *const c_char);
 }
