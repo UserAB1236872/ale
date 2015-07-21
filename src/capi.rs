@@ -36,7 +36,7 @@ impl ALE {
     pub fn get_bool(&self, key: &str) -> bool {
         unsafe {
             let key = CString::new(key).unwrap();
-            getBool(self.p, key.as_ptr()) == 0
+            getBool(self.p, key.as_ptr()) != 0
         }
     }
 
