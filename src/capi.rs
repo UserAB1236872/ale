@@ -6,7 +6,7 @@ use self::libc::{c_char, c_int, c_float};
 
 use std::convert::Into;
 
-pub struct Action(isize);
+pub struct Action(i32);
 
 pub struct ALE {
     p: *mut ale_interface
@@ -40,10 +40,10 @@ impl ALE {
         }
     }
 
-    pub fn get_int(&self, key: &str) -> isize {
+    pub fn get_int(&self, key: &str) -> i32 {
         unsafe {
             let key = CString::new(key).unwrap();
-            getInt(self.p, key.as_ptr()) as isize
+            getInt(self.p, key.as_ptr()) as i32
         }
     }
 
@@ -71,7 +71,7 @@ impl ALE {
         }
     }
 
-    pub fn set_int(&self, key: &str, val: isize) {
+    pub fn set_int(&self, key: &str, val: i32) {
         unsafe {
             let key = CString::new(key).unwrap();
 
@@ -156,7 +156,7 @@ impl Game {
             let mut actions = Vec::<Action>::with_capacity(size);
 
             for action in buf.into_iter() {
-                actions.push(Action(action as isize));
+                actions.push(Action(action as i32));
             }
 
             actions
@@ -173,7 +173,7 @@ impl Game {
             let mut actions = Vec::<Action>::with_capacity(size);
 
             for action in buf.into_iter() {
-                actions.push(Action(action as isize));
+                actions.push(Action(action as i32));
             }
 
             actions
