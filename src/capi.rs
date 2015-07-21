@@ -129,6 +129,14 @@ impl Game {
             act(self.ale.p, action as c_int);
         }
     }
+
+    /// This reports whether or not the game is over. This is equivalent to the C API wrapper's
+    /// game_over function.
+    pub fn is_over(&self) -> bool {
+        unsafe {
+            game_over(self.ale.p) != 0
+        }
+    }
 }
 
 impl Into<ALE> for Game {
@@ -161,4 +169,5 @@ extern {
 
     // General emulation
     fn act(i: *mut ale_interface, action: c_int);
+    fn game_over(i: *mut ale_interface) -> c_int;
 }
