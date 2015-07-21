@@ -145,6 +145,40 @@ impl Game {
             reset_game(self.ale.p);
         }
     }
+
+    pub fn legal_action_set(&self) -> Vec<Action> {
+        unsafe {
+            let size = getLegalActionSize(self.ale.p) as usize;
+            let mut buf = Vec::<c_int>::with_capacity(size);
+
+            getLegalActionSet(self.ale.p, buf.as_mut_ptr());
+
+            let mut actions = Vec::<Action>::with_capacity(size);
+
+            for action in buf.into_iter() {
+                actions.push(Action(action as isize));
+            }
+
+            actions
+        }
+    }
+
+    pub fn minimal_action_set(&self) -> Vec<Action> {
+        unsafe {
+            let size = getMinimalActionSize(self.ale.p) as usize;
+            let mut buf = Vec::<c_int>::with_capacity(size);
+
+            getMinimalActionSet(self.ale.p, buf.as_mut_ptr());
+
+            let mut actions = Vec::<Action>::with_capacity(size);
+
+            for action in buf.into_iter() {
+                actions.push(Action(action as isize));
+            }
+
+            actions
+        }
+    }
 }
 
 impl Into<ALE> for Game {
@@ -179,4 +213,10 @@ extern {
     fn act(i: *mut ale_interface, action: c_int);
     fn game_over(i: *mut ale_interface) -> c_int;
     fn reset_game(i: *mut ale_interface);
+    
+    // Action getters
+    fn getLegalActionSet(i: *mut ale_interface, actions: *mut c_int);
+    fn getLegalActionSize(i: *mut ale_interface) -> c_int;
+    fn getMinimalActionSet(i: *mut ale_interface, actions: *mut c_int);
+    fn getMinimalActionSize(i: *mut ale_interface) -> c_int;
 }
