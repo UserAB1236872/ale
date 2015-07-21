@@ -58,6 +58,14 @@ impl ALE {
             setString(self.p, key.as_ptr(), val.as_ptr());
         }
     }
+
+    pub fn set_bool(&self, key: &str, val: bool) {
+        unsafe {
+            let key = CString::new(key).unwrap();
+
+            setBool(self.p, key.as_ptr(), val as c_int);
+        }
+    }
 }
 
 impl Drop for ALE {
@@ -82,4 +90,5 @@ extern {
 
     // Setters
     fn setString(i: *mut ale_interface, key: *const c_char, val: *const c_char);
+    fn setBool(i: *mut ale_interface, key: *const c_char, val: c_int);
 }
