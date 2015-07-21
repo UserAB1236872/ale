@@ -1,0 +1,7 @@
+[package]
+name = "ale"
+version = "0.1.0"
+authors = ["Jeff Juozapaitis <Jragonmiris@gmail.com>"]
+
+[dependencies]
+libc = "0.1"
