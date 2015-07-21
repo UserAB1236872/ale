@@ -43,14 +43,14 @@ impl ALE {
     pub fn get_int(&self, key: &str) -> i32 {
         unsafe {
             let key = CString::new(key).unwrap();
-            getInt(self.p, key.as_ptr()) as i32
+            getInt(self.p, key.as_ptr())
         }
     }
 
-    pub fn get_float(&self, key: &str) -> f64 {
+    pub fn get_float(&self, key: &str) -> f32 {
         unsafe {
             let key = CString::new(key).unwrap();
-            getFloat(self.p, key.as_ptr()) as f64
+            getFloat(self.p, key.as_ptr())
         }
     }
 
@@ -75,15 +75,15 @@ impl ALE {
         unsafe {
             let key = CString::new(key).unwrap();
 
-            setInt(self.p, key.as_ptr(), val as c_int);
+            setInt(self.p, key.as_ptr(), val);
         }
     }
 
-    pub fn set_float(&self, key: &str, val: f64) {
+    pub fn set_float(&self, key: &str, val: f32) {
         unsafe {
             let key = CString::new(key).unwrap();
 
-            setFloat(self.p, key.as_ptr(), val as c_float);
+            setFloat(self.p, key.as_ptr(), val);
         }
     }
 
@@ -126,7 +126,7 @@ impl Game {
         unsafe {
             let Action(action) = action;
 
-            act(self.ale.p, action as c_int);
+            act(self.ale.p, action);
         }
     }
 
@@ -156,7 +156,7 @@ impl Game {
             let mut actions = Vec::<Action>::with_capacity(size);
 
             for action in buf.into_iter() {
-                actions.push(Action(action as i32));
+                actions.push(Action(action));
             }
 
             actions
@@ -173,7 +173,7 @@ impl Game {
             let mut actions = Vec::<Action>::with_capacity(size);
 
             for action in buf.into_iter() {
-                actions.push(Action(action as i32));
+                actions.push(Action(action));
             }
 
             actions
