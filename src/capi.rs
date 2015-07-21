@@ -49,6 +49,15 @@ impl ALE {
             getFloat(self.p, key.as_ptr()) as f64
         }
     }
+
+    pub fn set_string(&self, key: &str, val: &str) {
+        unsafe {
+            let key = CString::new(key).unwrap();
+            let val = CString::new(val).unwrap();
+
+            setString(self.p, key.as_ptr(), val.as_ptr());
+        }
+    }
 }
 
 impl Drop for ALE {
@@ -70,4 +79,7 @@ extern {
     fn getBool(i: *mut ale_interface, key: *const c_char) -> c_int;
     fn getInt(i: *mut ale_interface, key: *const c_char) -> c_int;
     fn getFloat(i: *mut ale_interface, key: *const c_char) -> c_float;
+
+    // Setters
+    fn setString(i: *mut ale_interface, key: *const c_char, val: *const c_char);
 }
