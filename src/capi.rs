@@ -2,7 +2,7 @@ extern crate libc;
 use std::ffi::{CStr, CString};
 use std::ops::Drop;
 
-use self::libc::{c_char, c_int};
+use self::libc::{c_char, c_int, c_float};
 
 pub struct ALE {
     p: *mut ale_interface
@@ -42,6 +42,13 @@ impl ALE {
             getInt(self.p, key.as_ptr()) as isize
         }
     }
+
+    pub fn get_float(&self, key: &str) -> f64 {
+        unsafe {
+            let key = CString::new(key).unwrap();
+            getFloat(self.p, key.as_ptr()) as f64
+        }
+    }
 }
 
 impl Drop for ALE {
@@ -62,4 +69,5 @@ extern {
     fn getString(i: *mut ale_interface, key: *const c_char) -> *const c_char;
     fn getBool(i: *mut ale_interface, key: *const c_char) -> c_int;
     fn getInt(i: *mut ale_interface, key: *const c_char) -> c_int;
+    fn getFloat(i: *mut ale_interface, key: *const c_char) -> c_float;
 }
