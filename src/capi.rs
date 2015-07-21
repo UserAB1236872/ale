@@ -4,6 +4,10 @@ use std::ops::Drop;
 
 use self::libc::{c_char, c_int, c_float};
 
+use std::convert::Into;
+
+pub struct Action(isize);
+
 pub struct ALE {
     p: *mut ale_interface
 }
@@ -83,18 +87,53 @@ impl ALE {
         }
     }
 
-    pub fn load_rom(&self, file_name: &str) {
+    /// load_rom loads a rom from the given file name.
+    /// This consumes the ALE interface and yields a game (because only one
+    /// may be active at a time). The base ALE can be retrieved from the game.
+    pub fn load_rom(self, file_name: &str) -> Game {
         unsafe {
             let file_name = CString::new(file_name).unwrap();
 
             loadROM(self.p, file_name.as_ptr());
         }
+
+        Game::new(self)
     } 
 }
 
 impl Drop for ALE {
     fn drop(&mut self) {
         unsafe { ALE_del(self.p) }
+    }
+}
+
+pub struct Game {
+    ale: ALE
+}
+
+impl Game {
+    fn new(ale: ALE) -> Game {
+        Game{ale: ale}
+    }
+
+    /// Changes the game by loading a new ROM. This consumes the current game
+    /// and returns a new one with a reference to the same underlying ALE environment.
+    pub fn change_game(self, file_name: &str) -> Game {
+        self.ale.load_rom(file_name)
+    }
+
+    pub fn act(&self, action: Action) {
+        unsafe {
+            let Action(action) = action;
+
+            act(self.ale.p, action as c_int);
+        }
+    }
+}
+
+impl Into<ALE> for Game {
+    fn into(self) -> ALE {
+        self.ale
     }
 }
 
@@ -119,4 +158,7 @@ extern {
     fn setFloat(i: *mut ale_interface, key: *const c_char, val: c_float);
 
     fn loadROM(i: *mut ale_interface, file_name: *const c_char);
+
+    // General emulation
+    fn act(i: *mut ale_interface, action: c_int);
 }
