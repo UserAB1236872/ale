@@ -137,6 +137,14 @@ impl Game {
             game_over(self.ale.p) != 0
         }
     }
+
+    /// Resets the current game. This is equivalent to the C API wrapper's
+    /// reset_game function.
+    pub fn reset(&self) {
+        unsafe {
+            reset_game(self.ale.p);
+        }
+    }
 }
 
 impl Into<ALE> for Game {
@@ -170,4 +178,5 @@ extern {
     // General emulation
     fn act(i: *mut ale_interface, action: c_int);
     fn game_over(i: *mut ale_interface) -> c_int;
+    fn reset_game(i: *mut ale_interface);
 }
