@@ -280,6 +280,26 @@ impl Game {
 
         buf
     }
+
+    pub fn save_state(&self) {
+        unsafe {
+            saveState(self.ale.p);
+        }
+    }
+
+    pub fn load_state(&self) {
+        unsafe {
+            loadState(self.ale.p);
+        }
+    }
+
+    pub fn save_screen_png(&self, file_name: &str) {
+        unsafe {
+            let file_name = CString::new(file_name).unwrap();
+
+            saveScreenPNG(self.ale.p, file_name.as_ptr());
+        }
+    }
 }
 
 impl Into<ALE> for Game {
@@ -334,4 +354,9 @@ extern {
     // RAM
     fn getRAMSize(i: *mut ale_interface) -> c_int;
     fn getRAM(i: *mut ale_interface, buf: *const c_uchar);
+
+    // State and screen saving
+    fn saveState(i: *mut ale_interface);
+    fn loadState(i: *mut ale_interface);
+    fn saveScreenPNG(i: *mut ale_interface, file_name: *const c_char);
 }
