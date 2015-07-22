@@ -197,6 +197,14 @@ impl Game {
             getEpisodeFrameNumber(self.ale.p)
         }
     }
+
+    /// Gets the screen dimensions and returns them as a tuple of
+    /// (width,height)
+    pub fn screen_dimensions(&self) -> (i32,i32) {
+        unsafe {
+            (getScreenWidth(self.ale.p), getScreenHeight(self.ale.p))
+        }
+    }
 }
 
 impl Into<ALE> for Game {
@@ -241,4 +249,8 @@ extern {
     fn getFrameNumber(i: *mut ale_interface) -> c_int;
     fn lives(i: *mut ale_interface) -> c_int;
     fn getEpisodeFrameNumber(i: *mut ale_interface) -> c_int;
+
+    // Screen functions
+    fn getScreenWidth(i: *mut ale_interface) -> c_int;
+    fn getScreenHeight(i: *mut ale_interface) -> c_int;
 }
