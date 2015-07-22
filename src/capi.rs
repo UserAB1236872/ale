@@ -228,6 +228,29 @@ impl Game {
 
         buf
     }
+
+    pub fn screen_rgb_in_buf(&self, buf: &mut Vec<u8>) {
+        unsafe {
+            let (width,height) = self.screen_dimensions();
+            let cap = buf.capacity();
+            if cap < (width*height) as usize {
+                buf.reserve_exact((width*height) as usize - cap);
+            }
+
+            buf.set_len((width*height) as usize);
+
+            getScreenRGB(self.ale.p, buf.as_mut_ptr());
+        }
+    }
+
+    pub fn screen_rgb(&self) -> Vec<u8> {
+        let (width,height) = self.screen_dimensions();
+        let mut buf = Vec::<u8>::with_capacity( (width*height) as usize);
+
+        self.screen_rgb_in_buf(&mut buf);
+
+        buf
+    }
 }
 
 impl Into<ALE> for Game {
@@ -277,4 +300,5 @@ extern {
     fn getScreenWidth(i: *mut ale_interface) -> c_int;
     fn getScreenHeight(i: *mut ale_interface) -> c_int;
     fn getScreen(i: *mut ale_interface, buf: *const c_uchar);
+    fn getScreenRGB(i: *mut ale_interface, buf: *const c_uchar);
 }
