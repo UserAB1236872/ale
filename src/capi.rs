@@ -155,6 +155,8 @@ impl Game {
 
             getLegalActionSet(self.ale.p, buf.as_mut_ptr());
 
+            buf.set_len(size);
+
             let mut actions = Vec::<Action>::with_capacity(size);
 
             for action in buf.into_iter() {
@@ -171,6 +173,8 @@ impl Game {
             let mut buf = Vec::<c_int>::with_capacity(size);
 
             getMinimalActionSet(self.ale.p, buf.as_mut_ptr());
+
+            buf.set_len(size);
 
             let mut actions = Vec::<Action>::with_capacity(size);
 
