@@ -28,7 +28,11 @@ fn main() {
     for episode in 0..EPISODES {
         let mut total_reward = 0;
         while !game.is_over() {
-            let a = rng.choose(legal_actions.as_slice()).unwrap();
+            let a = rng.choose(legal_actions.as_slice());
+            let a = match a {
+                Some(a) => a,
+                None => { panic!("No actions available to select"); },
+            };
             total_reward += game.act(*a);
         }
 
