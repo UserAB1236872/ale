@@ -185,6 +185,18 @@ impl Game {
             getFrameNumber(self.ale.p)
         }
     }
+
+    pub fn lives(&self) -> i32 {
+        unsafe {
+            lives(self.ale.p)
+        }
+    }
+
+    pub fn episode_frame_number(&self) -> i32 {
+        unsafe {
+            getEpisodeFrameNumber(self.ale.p)
+        }
+    }
 }
 
 impl Into<ALE> for Game {
@@ -227,4 +239,6 @@ extern {
     fn getMinimalActionSize(i: *mut ale_interface) -> c_int;
 
     fn getFrameNumber(i: *mut ale_interface) -> c_int;
+    fn lives(i: *mut ale_interface) -> c_int;
+    fn getEpisodeFrameNumber(i: *mut ale_interface) -> c_int;
 }
