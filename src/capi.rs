@@ -122,11 +122,11 @@ impl Game {
         self.ale.load_rom(file_name)
     }
 
-    pub fn act(&self, action: Action) {
+    pub fn act(&self, action: Action) -> i32 {
         unsafe {
             let Action(action) = action;
 
-            act(self.ale.p, action);
+            act(self.ale.p, action)
         }
     }
 
@@ -331,7 +331,7 @@ extern {
     fn loadROM(i: *mut ale_interface, file_name: *const c_char);
 
     // General emulation
-    fn act(i: *mut ale_interface, action: c_int);
+    fn act(i: *mut ale_interface, action: c_int) -> c_int;
     fn game_over(i: *mut ale_interface) -> c_int;
     fn reset_game(i: *mut ale_interface);
     

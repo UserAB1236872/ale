@@ -5,3 +5,4 @@ authors = ["Jeff Juozapaitis <Jragonmiris@gmail.com>"]
 
 [dependencies]
 libc = "0.1"
+rand = "0.3"
