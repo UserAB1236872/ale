@@ -1,5 +1,3 @@
-pub mod capi;
+mod capi;
 
-#[test]
-fn it_works() {
-}
+pub use self::capi::*;
