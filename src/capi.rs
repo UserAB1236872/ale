@@ -251,6 +251,35 @@ impl Game {
 
         buf
     }
+
+    pub fn ram_size(&self) -> i32 {
+        unsafe {
+            getRAMSize(self.ale.p)
+        }
+    }
+
+    pub fn ram_in_buf(&self, buf: &mut Vec<u8>) {
+        unsafe {
+            let size = self.ram_size() as usize;
+            let cap = buf.capacity();
+            if cap < size {
+                buf.reserve_exact(size - cap);
+            }
+
+            buf.set_len(size);
+
+            getRAM(self.ale.p, buf.as_mut_ptr());
+        }
+    }
+
+    pub fn ram(&self) -> Vec<u8> {
+        let size = self.ram_size() as usize;
+        let mut buf = Vec::<u8>::with_capacity(size);
+
+        self.ram_in_buf(&mut buf);
+
+        buf
+    }
 }
 
 impl Into<ALE> for Game {
@@ -301,4 +330,8 @@ extern {
     fn getScreenHeight(i: *mut ale_interface) -> c_int;
     fn getScreen(i: *mut ale_interface, buf: *const c_uchar);
     fn getScreenRGB(i: *mut ale_interface, buf: *const c_uchar);
+
+    // RAM
+    fn getRAMSize(i: *mut ale_interface) -> c_int;
+    fn getRAM(i: *mut ale_interface, buf: *const c_uchar);
 }
