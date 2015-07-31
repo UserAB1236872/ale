@@ -3,7 +3,7 @@ extern crate libc;
 use std::ffi::{CStr, CString};
 use std::ops::Drop;
 
-use self::libc::{c_char, c_int, c_float, c_uchar};
+use self::libc::{c_char, c_int, c_float, c_uchar, c_void};
 
 use std::convert::Into;
 
@@ -14,8 +14,7 @@ pub struct ALE {
     p: *mut ale_interface
 }
 
-#[repr(C)]
-struct ale_interface;
+enum ale_interface{}
 
 impl ALE {
     pub fn new() -> ALE {
