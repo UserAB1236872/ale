@@ -7,14 +7,14 @@ use self::libc::{c_char, c_int, c_float, c_uchar};
 
 use std::convert::Into;
 
-#[derive(Clone,Copy,Eq,PartialEq,Hash,Debug)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
 pub struct Action(pub i32);
 
 pub struct ALE {
     p: *mut AleInterface
 }
 
-enum AleInterface{}
+enum AleInterface {}
 
 impl ALE {
     pub fn new() -> ALE {
@@ -99,7 +99,7 @@ impl ALE {
         }
 
         Game::new(self)
-    } 
+    }
 }
 
 impl Drop for ALE {
@@ -114,7 +114,7 @@ pub struct Game {
 
 impl Game {
     fn new(ale: ALE) -> Game {
-        Game{ale: ale}
+        Game { ale: ale }
     }
 
     /// Changes the game by loading a new ROM. This consumes the current game
@@ -205,7 +205,7 @@ impl Game {
 
     /// Gets the screen dimensions and returns them as a tuple of
     /// (width,height)
-    pub fn screen_dimensions(&self) -> (i32,i32) {
+    pub fn screen_dimensions(&self) -> (i32, i32) {
         unsafe {
             (getScreenWidth(self.ale.p), getScreenHeight(self.ale.p))
         }
@@ -213,21 +213,21 @@ impl Game {
 
     pub fn screen_in_buf(&self, buf: &mut Vec<u8>) {
         unsafe {
-            let (width,height) = self.screen_dimensions();
+            let (width, height) = self.screen_dimensions();
             let cap = buf.capacity();
-            if cap < (width*height) as usize {
-                buf.reserve_exact((width*height) as usize - cap);
+            if cap < (width * height) as usize {
+                buf.reserve_exact((width * height) as usize - cap);
             }
 
-            buf.set_len((width*height) as usize);
+            buf.set_len((width * height) as usize);
 
             getScreen(self.ale.p, buf.as_mut_ptr());
         }
     }
 
     pub fn screen(&self) -> Vec<u8> {
-        let (width,height) = self.screen_dimensions();
-        let mut buf = Vec::<u8>::with_capacity( (width*height) as usize);
+        let (width, height) = self.screen_dimensions();
+        let mut buf = Vec::<u8>::with_capacity((width * height) as usize);
 
         self.screen_in_buf(&mut buf);
 
@@ -236,21 +236,21 @@ impl Game {
 
     pub fn screen_rgb_in_buf(&self, buf: &mut Vec<u8>) {
         unsafe {
-            let (width,height) = self.screen_dimensions();
+            let (width, height) = self.screen_dimensions();
             let cap = buf.capacity();
-            if cap < (width*height) as usize {
-                buf.reserve_exact((width*height) as usize - cap);
+            if cap < (width * height) as usize {
+                buf.reserve_exact((width * height) as usize - cap);
             }
 
-            buf.set_len((width*height) as usize);
+            buf.set_len((width * height) as usize);
 
             getScreenRGB(self.ale.p, buf.as_mut_ptr());
         }
     }
 
     pub fn screen_rgb(&self) -> Vec<u8> {
-        let (width,height) = self.screen_dimensions();
-        let mut buf = Vec::<u8>::with_capacity( (width*height) as usize);
+        let (width, height) = self.screen_dimensions();
+        let mut buf = Vec::<u8>::with_capacity((width * height) as usize);
 
         self.screen_rgb_in_buf(&mut buf);
 
@@ -313,13 +313,12 @@ impl Into<ALE> for Game {
     }
 }
 
-#[link(name="ale_c")]
+#[link(name = "ale_c")]
 extern {
     // Creation/Deletion functions
 
     fn ALE_new() -> *mut AleInterface;
     fn ALE_del(i: *mut AleInterface);
-
 
     // Getters
     fn getString(i: *mut AleInterface, key: *const c_char) -> *const c_char;
@@ -339,7 +338,7 @@ extern {
     fn act(i: *mut AleInterface, action: c_int) -> c_int;
     fn game_over(i: *mut AleInterface) -> c_int;
     fn reset_game(i: *mut AleInterface);
-    
+
     // Action getters
     fn getLegalActionSet(i: *mut AleInterface, actions: *mut c_int);
     fn getLegalActionSize(i: *mut AleInterface) -> c_int;
