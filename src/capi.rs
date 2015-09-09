@@ -2,6 +2,7 @@ extern crate libc;
 
 use std::ffi::{CStr, CString};
 use std::ops::Drop;
+use std::sync::atomic::AtomicBool;
 
 use self::libc::{c_char, c_int, c_float, c_uchar};
 
@@ -14,10 +15,21 @@ pub struct ALE {
     p: *mut AleInterface
 }
 
+// ALE is not thread safe at the moment, so we need to ensure only one exists
+static mut INSTANCE_EXISTS: AtomicBool = AtomicBool::new(false);
+const ALE_ERROR: &'static str = r#"An ALE instance already exists. 
+The ALE currently uses global statics and is not thread safe, if you need multiple instances use a script to start multiple, separate processes.
+If you need to run multiple ALEs in sequence on separate threads, arrange the synchronization yourself (e.g. mutexes or sending over a channel).
+"#;
+
 enum AleInterface {}
 
 impl ALE {
     pub fn new() -> ALE {
+        use std::sync::atomic::Ordering;
+        unsafe {
+            assert!(!INSTANCE_EXISTS.swap(true, Ordering::SeqCst), ALE_ERROR);
+        }
         ALE {
             p: unsafe { ALE_new() }
         }
@@ -104,7 +116,11 @@ impl ALE {
 
 impl Drop for ALE {
     fn drop(&mut self) {
-        unsafe { ALE_del(self.p) }
+        use std::sync::atomic::Ordering;
+        unsafe { 
+            ALE_del(self.p);
+            INSTANCE_EXISTS.store(false, Ordering::Relaxed);
+        }
     }
 }
 
