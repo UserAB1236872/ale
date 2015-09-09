@@ -24,6 +24,8 @@ If you need to run multiple ALEs in sequence on separate threads, arrange the sy
 
 enum AleInterface {}
 
+unsafe impl Send for ALE {}
+
 impl ALE {
     pub fn new() -> ALE {
         use std::sync::atomic::Ordering;
@@ -127,6 +129,8 @@ impl Drop for ALE {
 pub struct Game {
     ale: ALE
 }
+
+unsafe impl Send for Game {}
 
 impl Game {
     fn new(ale: ALE) -> Game {
