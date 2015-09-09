@@ -2,7 +2,7 @@ extern crate libc;
 
 use std::ffi::{CStr, CString};
 use std::ops::Drop;
-use std::sync::atomic::AtomicBool;
+use std::sync::atomic::{AtomicBool, ATOMIC_BOOL_INIT};
 
 use self::libc::{c_char, c_int, c_float, c_uchar};
 
@@ -16,7 +16,7 @@ pub struct ALE {
 }
 
 // ALE is not thread safe at the moment, so we need to ensure only one exists
-static mut INSTANCE_EXISTS: AtomicBool = AtomicBool::new(false);
+static mut INSTANCE_EXISTS: AtomicBool = ATOMIC_BOOL_INIT;
 const ALE_ERROR: &'static str = r#"An ALE instance already exists. 
 The ALE currently uses global statics and is not thread safe, if you need multiple instances use a script to start multiple, separate processes.
 If you need to run multiple ALEs in sequence on separate threads, arrange the synchronization yourself (e.g. mutexes or sending over a channel).
