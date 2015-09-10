@@ -25,6 +25,7 @@ If you need to run multiple ALEs in sequence on separate threads, arrange the sy
 enum AleInterface {}
 
 unsafe impl Send for ALE {}
+unsafe impl Sync for ALE {}
 
 impl ALE {
     pub fn new() -> ALE {
@@ -131,6 +132,7 @@ pub struct Game {
 }
 
 unsafe impl Send for Game {}
+unsafe impl Sync for Game {}
 
 impl Game {
     fn new(ale: ALE) -> Game {
@@ -143,7 +145,7 @@ impl Game {
         self.ale.load_rom(file_name)
     }
 
-    pub fn act(&self, action: Action) -> i32 {
+    pub fn act(&mut self, action: Action) -> i32 {
         unsafe {
             let Action(action) = action;
 
@@ -161,7 +163,7 @@ impl Game {
 
     /// Resets the current game. This is equivalent to the C API wrapper's
     /// reset_game function.
-    pub fn reset(&self) {
+    pub fn reset(&mut self) {
         unsafe {
             reset_game(self.ale.p);
         }
@@ -306,13 +308,13 @@ impl Game {
         buf
     }
 
-    pub fn save_state(&self) {
+    pub fn save_state(&mut self) {
         unsafe {
             saveState(self.ale.p);
         }
     }
 
-    pub fn load_state(&self) {
+    pub fn load_state(&mut self) {
         unsafe {
             loadState(self.ale.p);
         }
