@@ -70,7 +70,7 @@ impl ALE {
         }
     }
 
-    pub fn set_string(&self, key: &str, val: &str) {
+    pub fn set_string(&mut self, key: &str, val: &str) {
         unsafe {
             let key = CString::new(key).unwrap();
             let val = CString::new(val).unwrap();
@@ -79,7 +79,7 @@ impl ALE {
         }
     }
 
-    pub fn set_bool(&self, key: &str, val: bool) {
+    pub fn set_bool(&mut self, key: &str, val: bool) {
         unsafe {
             let key = CString::new(key).unwrap();
 
@@ -87,7 +87,7 @@ impl ALE {
         }
     }
 
-    pub fn set_int(&self, key: &str, val: i32) {
+    pub fn set_int(&mut self, key: &str, val: i32) {
         unsafe {
             let key = CString::new(key).unwrap();
 
@@ -95,7 +95,7 @@ impl ALE {
         }
     }
 
-    pub fn set_float(&self, key: &str, val: f32) {
+    pub fn set_float(&mut self, key: &str, val: f32) {
         unsafe {
             let key = CString::new(key).unwrap();
 
