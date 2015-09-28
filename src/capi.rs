@@ -8,7 +8,7 @@ use self::libc::{c_char, c_int, c_float, c_uchar};
 
 use std::convert::Into;
 
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug, RustcEncodable, RustcDecodable)]
 pub struct Action(pub i32);
 
 pub struct ALE {

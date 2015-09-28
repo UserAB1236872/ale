@@ -5,6 +5,8 @@ authors = ["Jeff Juozapaitis <Jragonmiris@gmail.com>"]
 
 [dependencies]
 libc = "0.1"
+rustc-serialize = "0.3"
+clippy = "*"
 
 [dev-dependencies]
 rand = "0.3"
