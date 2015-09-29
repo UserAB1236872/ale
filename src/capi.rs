@@ -424,10 +424,7 @@ impl Encodable for AleState {
 
 impl Decodable for AleState {
     fn decode<D: Decoder>(d: &mut D) -> Result<Self,D::Error> {
-        let serial = match Vec::decode(d) {
-            Err(err) => { return Err(err); },
-            Ok(serial) => serial,
-        };
+        let serial = try!(Vec::decode(d));
 
         Ok(AleState{
             s: decode_state(&serial),
@@ -456,10 +453,7 @@ impl Encodable for AleSystemState {
 
 impl Decodable for AleSystemState {
     fn decode<D: Decoder>(d: &mut D) -> Result<Self,D::Error> {
-        let serial = match Vec::decode(d) {
-            Err(err) => { return Err(err); },
-            Ok(serial) => serial,
-        };
+        let serial = try!(Vec::decode(d));
 
         Ok(AleSystemState{
             s: decode_state(&serial),
