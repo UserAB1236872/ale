@@ -3,6 +3,7 @@ extern crate libc;
 use std::ffi::{CStr, CString};
 use std::ops::Drop;
 use std::sync::atomic::{AtomicBool, ATOMIC_BOOL_INIT};
+use ::rustc_serialize::{Encodable,Decodable,Encoder,Decoder};
 
 use self::libc::{c_char, c_int, c_float, c_uchar};
 
@@ -115,6 +116,7 @@ impl ALE {
 
         Game::new(self)
     }
+
 }
 
 impl Drop for ALE {
@@ -327,11 +329,118 @@ impl Game {
             saveScreenPNG(self.ale.p, file_name.as_ptr());
         }
     }
+
+    pub fn clone_state(&self) -> AleState {
+        AleState{
+            s: unsafe{ cloneState(self.ale.p) },
+        }
+    }
+
+    pub fn clone_system_state(&self) -> AleSystemState {
+        AleSystemState{
+            s: unsafe{ cloneSystemState(self.ale.p) },
+        }
+    }
+
+    pub fn restore_from_cloned_state(&mut self, s: &AleState) {
+        unsafe {
+            restoreState(self.ale.p, s.s);
+        }
+    }
+
+    pub fn restore_from_cloned_system_state(&mut self, s: &AleSystemState) {
+        unsafe {
+            restoreSystemState(self.ale.p, s.s);
+        }
+    }
 }
 
 impl Into<ALE> for Game {
     fn into(self) -> ALE {
         self.ale
+    }
+}
+
+enum CAleState {}
+
+pub struct AleState {
+    s: *mut CAleState,
+}
+
+impl Drop for AleState {
+    fn drop(&mut self) {
+        unsafe {
+            deleteState(self.s);
+        }
+    }
+}
+
+impl Encodable for AleState {
+    fn encode<S: Encoder>(&self, s: &mut S) -> Result<(),S::Error> {
+        let serial = encode_state(self.s);
+        serial.encode(s)
+    }
+}
+
+impl Decodable for AleState {
+    fn decode<D: Decoder>(d: &mut D) -> Result<Self,D::Error> {
+        let serial = match Vec::decode(d) {
+            Err(err) => { return Err(err); },
+            Ok(serial) => serial,
+        };
+
+        Ok(AleState{
+            s: decode_state(&serial),
+        })
+    }
+}
+
+pub struct AleSystemState {
+    s: *mut CAleState,
+}
+
+impl Drop for AleSystemState {
+    fn drop(&mut self) {
+        unsafe {
+            deleteState(self.s)
+        }
+    }
+}
+
+impl Encodable for AleSystemState {
+    fn encode<S: Encoder>(&self, s: &mut S) -> Result<(),S::Error> {
+        let serial = encode_state(self.s);
+        serial.encode(s)
+    }
+}
+
+impl Decodable for AleSystemState {
+    fn decode<D: Decoder>(d: &mut D) -> Result<Self,D::Error> {
+        let serial = match Vec::decode(d) {
+            Err(err) => { return Err(err); },
+            Ok(serial) => serial,
+        };
+
+        Ok(AleSystemState{
+            s: decode_state(&serial),
+        })
+    }
+}
+
+fn encode_state(s: *mut CAleState) -> Vec<i8> {
+    unsafe {
+        let len = encodeStateLen(s) as usize;
+        let mut buf = Vec::<i8>::with_capacity(len);
+        buf.set_len(len);
+        encodeState(s, buf.as_mut_ptr());
+
+        buf
+    }
+}
+
+fn decode_state(serialized: &Vec<i8>) -> *mut CAleState {
+    unsafe {
+        decodeState(serialized.as_ptr())
     }
 }
 
@@ -385,4 +494,16 @@ extern {
     fn saveState(i: *mut AleInterface);
     fn loadState(i: *mut AleInterface);
     fn saveScreenPNG(i: *mut AleInterface, file_name: *const c_char);
+
+    // Serialization
+    fn cloneState(i: *mut AleInterface) -> *mut CAleState;
+    fn restoreState(i: *mut AleInterface, s: *mut CAleState);
+    fn cloneSystemState(i: *mut AleInterface) -> *mut CAleState;
+    fn restoreSystemState(i: *mut AleInterface, s: *mut CAleState);
+
+    fn deleteState(s: *mut CAleState);
+
+    fn encodeState(s: *mut CAleState, buf: *mut c_char) -> *const c_char;
+    fn encodeStateLen(s: *mut CAleState) -> i32;
+    fn decodeState(state: *const c_char) -> *mut CAleState;
 }
