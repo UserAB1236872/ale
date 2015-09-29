@@ -5,6 +5,10 @@ use std::ops::Drop;
 use std::sync::atomic::{AtomicBool, ATOMIC_BOOL_INIT};
 use ::rustc_serialize::{Encodable,Decodable,Encoder,Decoder};
 
+use std::path::Path;
+use std::fs::{File,PathExt};
+use std::io::{Read,Write};
+
 use self::libc::{c_char, c_int, c_float, c_uchar};
 
 use std::convert::Into;
@@ -114,7 +118,7 @@ impl ALE {
             loadROM(self.p, file_name.as_ptr());
         }
 
-        Game::new(self)
+        Game::new(self, file_name.to_owned())
     }
 
 }
@@ -130,15 +134,16 @@ impl Drop for ALE {
 }
 
 pub struct Game {
-    ale: ALE
+    ale: ALE,
+    rom_path: String,
 }
 
 unsafe impl Send for Game {}
 unsafe impl Sync for Game {}
 
 impl Game {
-    fn new(ale: ALE) -> Game {
-        Game { ale: ale }
+    fn new(ale: ALE, path: String) -> Game {
+        Game { ale: ale, rom_path: path }
     }
 
     /// Changes the game by loading a new ROM. This consumes the current game
@@ -352,6 +357,41 @@ impl Game {
         unsafe {
             restoreSystemState(self.ale.p, s.s);
         }
+    }
+}
+
+impl Encodable for Game {
+    fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
+        try!(self.rom_path.encode(s));
+        let path = Path::new(&self.rom_path);
+        let mut file = File::open(path).expect("Could not open ROM file");
+        let mut buf = Vec::<u8>::new();
+        file.read_to_end(&mut buf).expect("Could not read ROM file");
+
+        try!(buf.encode(s));
+        self.clone_system_state().encode(s)
+    }
+}
+
+impl Decodable for Game {
+    fn decode<D: Decoder>(d: &mut D) -> Result<Self, D::Error> {
+        let path_str = try!(String::decode(d));
+        let path = Path::new(&path_str);
+
+        let file_data = try!(Vec::<u8>::decode(d));
+        if !path.exists() {
+            match File::create(path) {
+                Ok(mut file) => { file.write_all(file_data.as_slice()).expect("Could not write to ROM file"); },
+                Err(err) => panic!(err),
+            };
+        }
+
+        let mut game = ALE::new().load_rom(path.to_str().unwrap());
+
+        let sys_state = try!(AleSystemState::decode(d));
+        game.restore_from_cloned_system_state(&sys_state);
+
+        Ok(game)
     }
 }
 

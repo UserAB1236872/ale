@@ -1,4 +1,4 @@
-#![feature(plugin)]
+#![feature(convert,path_ext,plugin)]
 #![plugin(clippy)]
 extern crate rustc_serialize;
 mod capi;
