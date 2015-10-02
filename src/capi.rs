@@ -12,6 +12,7 @@ use std::io::{Read,Write};
 use self::libc::{c_char, c_int, c_float, c_uchar};
 
 use std::convert::Into;
+use std::ops::{Deref,DerefMut};
 
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug, RustcEncodable, RustcDecodable)]
 pub struct Action(pub i32);
@@ -401,6 +402,20 @@ impl Into<ALE> for Game {
     }
 }
 
+impl Deref for Game {
+    type Target=ALE;
+
+    fn deref(&self) -> &ALE {
+        &self.ale
+    }
+}
+
+impl DerefMut for Game {
+    fn deref_mut(&mut self) -> &mut ALE {
+        &mut self.ale
+    }
+}
+
 enum CAleState {}
 
 pub struct AleState {
@@ -474,7 +489,7 @@ fn encode_state(s: *mut CAleState) -> Vec<i8> {
 
 fn decode_state(serialized: &Vec<i8>) -> *mut CAleState {
     unsafe {
-        decodeState(serialized.as_ptr())
+        decodeState(serialized.as_ptr(), serialized.len() as c_int)
     }
 }
 
@@ -539,5 +554,5 @@ extern {
 
     fn encodeState(s: *mut CAleState, buf: *mut c_char) -> *const c_char;
     fn encodeStateLen(s: *mut CAleState) -> i32;
-    fn decodeState(state: *const c_char) -> *mut CAleState;
+    fn decodeState(state: *const c_char, len: c_int) -> *mut CAleState;
 }
