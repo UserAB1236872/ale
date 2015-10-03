@@ -8,7 +8,7 @@ use std::ffi::CString;
 use ::Action;
 use ::Ale;
 
-use ::rustc_serialize::{Encoder,Encodable};
+use ::rustc_serialize::{Encoder,Encodable,Decoder,Decodable};
 use ::ffi::*;
 
 pub mod serialize;
@@ -250,6 +250,14 @@ impl Encodable for Game {
     }
 }
 
+impl Decodable for Game {
+    fn decode<D: Decoder>(d: &mut D) -> Result<Self, D::Error> {
+        use self::serialize::GameDecoder;
+        let prelim = try!(GameDecoder::decode(d));
+        Ok(prelim.decode_game())
+    }
+}
+
 impl Into<Ale> for Game {
     fn into(self) -> Ale {
         self.ale
@@ -278,7 +286,6 @@ pub mod protected {
     pub trait Protected {
         fn new(ale: Ale, path: String) -> Self;
     } 
-    
 
     impl Protected for Game {
         fn new(ale: Ale, path: String) -> Self {
