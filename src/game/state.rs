@@ -65,7 +65,7 @@ fn encode_state(s: *mut CAleState) -> Vec<i8> {
         let len = encodeStateLen(s) as usize;
         let mut buf = Vec::<i8>::with_capacity(len);
         buf.set_len(len);
-        encodeState(s, buf.as_mut_ptr());
+        encodeState(s, buf.as_mut_ptr(), buf.len() as c_int);
 
         buf
     }

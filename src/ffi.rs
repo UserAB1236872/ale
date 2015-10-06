@@ -64,7 +64,7 @@ extern {
 
     pub fn deleteState(s: *mut CAleState);
 
-    pub fn encodeState(s: *mut CAleState, buf: *mut c_char) -> *const c_char;
+    pub fn encodeState(s: *mut CAleState, buf: *mut c_char, len: c_int) -> *const c_char;
     pub fn encodeStateLen(s: *mut CAleState) -> i32;
     pub fn decodeState(state: *const c_char, len: c_int) -> *mut CAleState;
 }
