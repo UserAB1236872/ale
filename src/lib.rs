@@ -1,5 +1,6 @@
-#![feature(convert,path_ext,plugin)]
-#![plugin(clippy)]
+#![feature(convert,path_ext)]
+#![cfg_attr(feature="use_clippy", feature(plugin))]
+#![cfg_attr(feature="use_clippy", plugin(clippy))]
 extern crate rustc_serialize;
 extern crate libc;
 
