@@ -1,5 +1,5 @@
 use std::path::{Path,PathBuf};
-use std::fs::{File,PathExt};
+use std::fs::{File};
 use std::io::Write;
 use rustc_serialize::{Decoder,Decodable};
 use ::{Ale,AleSystemState};
