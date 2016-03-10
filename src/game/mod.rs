@@ -1,9 +1,6 @@
 use ::libc::c_int;
-use std::path::Path;
 use std::convert::Into;
 use std::ops::{Deref,DerefMut};
-use std::fs::{File};
-use std::io::{Read};
 use std::ffi::CString;
 use ::Action;
 use ::Ale;
@@ -235,17 +232,20 @@ impl Game {
             restoreSystemState(self.ale.p, s.s());
         }
     }
+
+    pub fn rom(&self) -> serialize::Rom {
+        serialize::Rom::new(&self.rom_path)
+    }
 }
 
 impl Encodable for Game {
     fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
+        use self::serialize::Rom;
+        
         try!(self.rom_path.encode(s));
-        let path = Path::new(&self.rom_path);
-        let mut file = File::open(path).expect("Could not open ROM file");
-        let mut buf = Vec::<u8>::new();
-        file.read_to_end(&mut buf).expect("Could not read ROM file");
+        let rom = Rom::new(&self.rom_path);
+        try!(rom.encode(s));
 
-        try!(buf.encode(s));
         self.clone_system_state().encode(s)
     }
 }
