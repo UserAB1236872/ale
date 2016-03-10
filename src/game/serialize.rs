@@ -50,15 +50,23 @@ impl GameDecoder {
 	}
 
 	pub fn decode_game(self) -> Game {
+		use std::fs;
+
 		let path = self.rom_path.as_path();
-		if !path.exists() {
-			match File::create(path) {
+		let filename = path.file_name().expect("Rom didn't have an actual file name?")
+						   .to_str().expect("Filename was not valid unicode");
+
+		let backup_path = format!("./ROMs/{}", filename);
+
+		if !path.exists() {	
+			fs::create_dir_all("./ROMs").expect("Could not create ROM directory");
+			match File::create(&backup_path) {
 					Ok(mut file) => { file.write_all(self.romfile.as_slice()).expect("Could not find or write ROM file") },
 					Err(err) => panic!(err),
 			};
 		}
 
-		let mut game = self.ale.load_rom(path.to_str().unwrap());
+		let mut game = self.ale.load_rom(&backup_path);
 		game.restore_from_cloned_system_state(&self.initial_state);
 
 		game
