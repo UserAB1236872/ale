@@ -30,6 +30,13 @@ impl Game {
         self.ale.load_rom(file_name)
     }
 
+    pub fn change_game_in_place(&mut self, file_name: &str) {
+        unsafe {
+            let file_name = CString::new(file_name).unwrap();
+            loadROM(self.ale.p, file_name.as_ptr());
+        }
+    }
+
     pub fn act(&mut self, action: Action) -> i32 {
         unsafe {
             let Action(action) = action;
