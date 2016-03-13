@@ -164,7 +164,7 @@ impl Game {
 
     pub fn screen_rgb(&self) -> Vec<u8> {
         let (width, height) = self.screen_dimensions();
-        let mut buf = Vec::<u8>::with_capacity((width * height) as usize);
+        let mut buf = Vec::<u8>::with_capacity((width * height * 3) as usize);
 
         self.screen_rgb_in_buf(&mut buf);
 
