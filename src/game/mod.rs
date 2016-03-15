@@ -153,10 +153,10 @@ impl Game {
             let (width, height) = self.screen_dimensions();
             let cap = buf.capacity();
             if cap < (width * height) as usize {
-                buf.reserve_exact((width * height) as usize - cap);
+                buf.reserve_exact((width * height * 3) as usize - cap);
             }
 
-            buf.set_len((width * height) as usize);
+            buf.set_len((width * height * 3) as usize);
 
             getScreenRGB(self.ale.p, buf.as_mut_ptr());
         }
