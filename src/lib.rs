@@ -132,9 +132,13 @@ impl Ale {
 impl Drop for Ale {
     fn drop(&mut self) {
         use std::sync::atomic::Ordering;
-        unsafe { 
-            ALE_del(self.p);
-            INSTANCE_EXISTS.store(false, Ordering::Relaxed);
+        unsafe {
+            // If we didn't set the flag we must've set this
+            // unsafely so it's questionably safe to free 
+            if !INSTANCE_EXISTS.load(Ordering::SeqCst) {
+                ALE_del(self.p);
+                INSTANCE_EXISTS.store(false, Ordering::SeqCst);
+            }
         }
     }
 }
