@@ -45,6 +45,13 @@ impl Game {
         }
     }
 
+    pub unsafe fn from_raw_ptr(p: *mut AleInterface) -> Self {
+        Game {
+            ale: Ale::from_raw_ptr(p),
+            rom_path: "".to_owned(),
+        }
+    }
+
     /// This reports whether or not the game is over. This is equivalent to the C API wrapper's
     /// game_over function.
     pub fn is_over(&self) -> bool {
