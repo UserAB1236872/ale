@@ -4,7 +4,7 @@
 extern crate rustc_serialize;
 extern crate libc;
 
-mod ffi;
+pub mod ffi;
 mod game;
 pub mod serialize;
 pub use self::game::{Game,AleState,AleSystemState};
@@ -52,6 +52,12 @@ impl Ale {
             let cstr = CStr::from_ptr(getString(self.p, key.as_ptr()));
 
             from_utf8(cstr.to_bytes()).unwrap()
+        }
+    }
+
+    pub unsafe fn from_raw_ptr(p: *mut AleInterface) -> Self {
+        Ale {
+            p: p,
         }
     }
 
